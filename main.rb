@@ -1,31 +1,29 @@
 require 'dxruby'
 
 require_relative 'player'
-require_relative 'enemy'
+require_relative 'target'
 
 font = Font.new(32)
-player_img = Image.load("image/player.png")
-enemy_img = Image.load("image/enemy.png")
+player_img = Image.load("image/player.jpg")
+target_img = Image.load("image/target.png")
 
-player = Player.new(100, 100, player_img)
-enemies = []
-10.times do
-  enemies << Enemy.new(rand(0..(640 - 32 - 1)), rand((480 - 32 - 1)), enemy_img)
-end
-
-timer = 600 + 60 # 追加
-
+player = Player.new(10, 10, player_img)
+timer = 0 # 追加
+targets = []
+targets << Target.new(rand(0..(640 - 32 - 1)), rand((480 - 32 - 1)), target_img)
 Window.loop do
-  if timer >= 60 # 追加
-    timer -= 1 # 追加
+  if player.score != 10
+    timer += 1 # 追加
     player.update
   end
 
   player.draw
 
-  Sprite.draw(enemies)
-  Window.draw_font(10, 0, "スコア：#{player.score}", font)
-  Window.draw_font(10, 32, "残り時間：#{timer / 60}秒", font) # 追加
+  Sprite.draw(targets)
+  time = timer / 60.0
+  Window.draw_font(10, 0, "タイム：#{time.round(3)}秒", font) # 追加
 
-  Sprite.check(player, enemies)
+  if Input.mouse_push?(M_LBUTTON) && Sprite.check(player, targets)
+    targets << Target.new(rand(0..(640 - 32 - 1)), rand((480 - 32 - 1)), target_img)
+  end
 end
